@@ -1,2 +1,2 @@
 # Solidity
-smart contract 
+Smart contract projects for Beginners
