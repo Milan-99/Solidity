@@ -1,1 +1,65 @@
 
+pragma solidity 0.8.1;
+import "erc20.sol";
+
+
+contract ICO {
+    using SafeMath for uint;
+    
+    Bitbet public token;
+    address public owner;
+    
+    //price of per token 
+    uint pricePerToken=4000000000000000;
+
+    uint availableToken;
+    uint MinPurchase=1000000000000000000;
+    uint MaxPurchase=1000000000000000000000000;
+    
+    
+    
+    constructor (Bitbet _token,uint _availabletoken){
+        
+        token=_token;
+        owner=msg.sender;
+        availableToken=_availabletoken;
+    }
+    
+    function deposite() public payable {
+         _transfer(msg.value);
+        
+    }
+    
+    //Function to receive plan ether & send the token equivalent to msg.value
+    receive() external payable{
+        _transfer(msg.value);
+        
+    }
+    function _transfer(uint256 _msg) internal {
+        uint256 sendvalue=_msg.div(pricePerToken);
+        require(availableToken>=sendvalue,"Insufficent token");
+        availableToken=availableToken.sub(sendvalue);
+        token.transfer(msg.sender,sendvalue*MinPurchase);
+        
+        
+    }
+    function withdrawEth(address payable _to,uint _amount) external onlyOwner{
+        _to.transfer(_amount);
+        
+    }
+    function WithdrawToken(address _to,uint _amount) external onlyOwner{
+        
+        Bitbet(token).transfer(_to,_amount);
+    }
+    function transferOwnership(address _owner) public{
+        require(msg.sender==owner);
+        owner=_owner;
+    }
+    
+    modifier onlyOwner(){
+        require(msg.sender==owner);
+        _;
+    }
+    
+    
+}
